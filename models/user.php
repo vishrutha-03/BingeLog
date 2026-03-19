@@ -71,7 +71,27 @@ class User {
             return false;
         }
     }
+    //login function 
+    public function login(){
+        global $database;
+        $this->email=trim(htmlspecialchars(strip_tags($this->email)));
+        $this->password=trim(htmlspecialchars(strip_tags($this->password)));
+        $sql="SELECT * FROM $this->table WHERE email='".$database->escape_value($this->email)."'";
+        $result=$database->query($sql);//running sql command
+        $user_data=$database->fetch_row($result); // fetching the result of this query
+        if(empty($user_data)){
+            return "User not found";}
+        else{
+            if(Bcrypt::checkPassword($this->password, $user_data['password'])){
+                unset($user_data['password']);// to remove password from the user data array before returning it in the response
+                return $user_data;
+            }
+            else{
+                return "Incorrect password";
+            }
+    }
 }
 
+}
 // create object
 $user = new User();
